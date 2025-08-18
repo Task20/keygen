@@ -23,5 +23,4 @@ jobs:
 
       - name: Echo Public Key
         run: |
-          echo "Public key is:"
-          echo "${{ steps.k.outputs.public-key }}"
+          printf '%s\n' "${{ steps.k.outputs.public-key }}"
