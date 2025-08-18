@@ -17,7 +17,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        chmod +x "$GITHUB_ACTION_PATH/../../keygen"
+        chmod +x "$GITHUB_WORKSPACE/keygen"
     - name: Run keygen
       id: run
       shell: bash
@@ -27,7 +27,7 @@ runs:
       run: |
         set -euo pipefail
         PUBLIC_KEY="$(
-          printf '%s' "$MASTER_PASSWORD" | "$GITHUB_ACTION_PATH/../../keygen" -- "$VERSION"
+          printf '%s' "$MASTER_PASSWORD" | "$GITHUB_WORKSPACE/keygen" -- "$VERSION"
         )"
 
         {
