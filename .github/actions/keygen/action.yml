@@ -1,0 +1,37 @@
+name: "Keygen"
+description: "Keygen"
+inputs:
+  version:
+    description: "Version"
+    required: true
+  master-password:
+    description: "Master password"
+    required: true
+outputs:
+  public-key:
+    description: "The public key"
+runs:
+  using: "composite"
+  steps:
+    - name: Add executable bit to keygen (may not be necessary...)
+      shell: bash
+      run: |
+        set -euo pipefail
+        chmod +x "$GITHUB_ACTION_PATH/../../keygen"
+    - name: Run keygen
+      id: run
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        MASTER_PASSWORD: ${{ inputs['master-password'] }}
+      run: |
+        set -euo pipefail
+        PUBLIC_KEY="$(
+          printf '%s' "$MASTER_PASSWORD" | "$GITHUB_ACTION_PATH/../../keygen" -- "$VERSION"
+        )"
+
+        {
+          echo 'public-key<<EOF'
+          echo "$PUBLIC_KEY"
+          echo 'EOF'
+        } >> "$GITHUB_OUTPUT"

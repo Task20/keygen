@@ -1,0 +1,27 @@
+name: Generate Public Key
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version number to derive the key for"
+        required: true
+        type: string
+
+jobs:
+  keygen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run keygen
+        id: k
+        uses: ./.github/actions/keygen
+        with:
+          version: ${{ inputs.version }}
+          master-password: ${{ secrets.MASTER_PASSWORD }}
+
+      - name: Echo Public Key
+        run: |
+          echo "Public key is:"
+          echo "${{ steps.k.outputs.public-key }}"
