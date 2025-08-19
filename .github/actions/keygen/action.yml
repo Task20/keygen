@@ -14,11 +14,27 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Determine binary
+      shell: bash
+      run: |
+        ARCH =$(uname -m)
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          FILENAME="$GITHUB_ACTION_PATH/keygen-linux"
+        elif [ "${{ runner.os }}" == "Windows" ]; then
+          FILENAME="$GITHUB_ACTION_PATH/keygen-windows"
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          if ["$ARCH" = "arm64"]; then
+            FILENAME="$GITHUB_ACTION_PATH/keygen-macos-arm"
+          else
+            FILENAME="$GITHUB_ACTION_PATH/keygen-macos-x86"
+          fi
+        fi
+        echo "BINARY_LOCATION=$FILENAME" >> $GITHUB_ENV
     - name: Add executable bit to keygen (may not be necessary...)
       shell: bash
       run: |
         set -euo pipefail
-        chmod +x "$GITHUB_ACTION_PATH/keygen"
+        chmod +x "${{env.BINARY_LOCATION}}"
     - name: Run keygen
       id: run
       shell: bash
@@ -28,7 +44,7 @@ runs:
       run: |
         set -euo pipefail
         PUBLIC_KEY="$(
-          printf '%s' "$MASTER_PASSWORD" | "$GITHUB_ACTION_PATH/keygen" -- "$VERSION"
+          printf '%s' "$MASTER_PASSWORD" | "${{BINARY_LOCATION}}" -- "$VERSION"
         )"
 
         {
